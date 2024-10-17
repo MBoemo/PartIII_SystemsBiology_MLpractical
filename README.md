@@ -33,13 +33,13 @@ Neural network training will be done in Tensorflow. Pandas, scikit-learn, and ma
 The data set is the PTB Diagnostic ECG Database. This consists of 14552 ECGs divided into two classes: normal and abnormal. The data is organised into two spreadsheets in comma-separated value format (ptbdb_normal.csv and pdbdb_abnormal.csv) such that each row is a different ECG signal. The signals are sampled at 125 Hz with samples along the columns. Each signal has a maximum of 187 samples (i.e., columns). If the signal was longer this, it was truncated; if the signal was shorter than this, it is padded with zeros. Each signal is given a binary label in the rightmost column (1 for abnormal, 0 for normal).
 
 ### Using Docker
-A Docker image has been provided that is pre-loaded with the above software and datasets. You can load it by doing:
+A Docker image is available that is pre-loaded with the above software and datasets. You can pull it by doing:
 ```shell
-docker load -i sysbioml-python.tar
+docker pull mboemo458/partiii_ml:latest
 ```
 Suppose you've written a Python script called `my_script.py`, the script is in your current directory, and you want to run it. You can do this with:
 ```shell
-docker run -v $(pwd):/scripts sysbioml-python my_script.py
+docker run -v $(pwd):/scripts mboemo458/partiii_ml my_script.py
 ```
 This will mount your current directory (where your`my_script.py` file is located) to the /scripts directory in the container and run it. The above datasets were also loaded into a directory in the image called /data so you can access them from `my_script.py` by doing:
 ```python
