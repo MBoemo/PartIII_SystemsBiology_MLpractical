@@ -1,3 +1,4 @@
+
 # Part III Systems Biology Machine Learning Practical
 
 As hardware and deep learning methods continue to improve, neural networks are now all around us. They impact our day-to-day lives in more ways than most people realise: As you read this sentence, there is a very good chance that a neural network is running on your wrist or in your pocket in order to make real-time predictions from data. In this practical, we will explore the the application of neural networks to wearable technology and healthcare by predicting abnormal heartbeats from electrocardogram (ECG) data. ECGs are available on devices such as the Apple Watch (https://support.apple.com/en-us/HT208955) and can be used to identify irregular heart rhythms (such as atrial fibrillation) which are a major risk factor for stroke. As we work through the practical, we will give special consideration to the engineering constraints we might have to contend with in order to detect an irregular heartbeat on a wearable device.
@@ -30,6 +31,21 @@ Neural network training will be done in Tensorflow. Pandas, scikit-learn, and ma
 
 ### Data Set and Format
 The data set is the PTB Diagnostic ECG Database. This consists of 14552 ECGs divided into two classes: normal and abnormal. The data is organised into two spreadsheets in comma-separated value format (ptbdb_normal.csv and pdbdb_abnormal.csv) such that each row is a different ECG signal. The signals are sampled at 125 Hz with samples along the columns. Each signal has a maximum of 187 samples (i.e., columns). If the signal was longer this, it was truncated; if the signal was shorter than this, it is padded with zeros. Each signal is given a binary label in the rightmost column (1 for abnormal, 0 for normal).
+
+### Using Docker
+A Docker image has been provided that is pre-loaded with the above software and datasets. You can load it by doing:
+```shell
+docker load -i sysbioml-python.tar
+```
+Suppose you've written a Python script called `my_script.py`, the script is in your current directory, and you want to run it. You can do this with:
+```shell
+docker run -v $(pwd):/scripts sysbioml-python my_script.py
+```
+This will mount your current directory (where your`my_script.py` file is located) to the /scripts directory in the container and run it. The above datasets were also loaded into a directory in the image called /data so you can access them from `my_script.py` by doing:
+```python
+f = open('/data/pdbdb_abnormal.csv','r')
+```
+
 
 # Part I: Building and Training a First Neural Network
 
