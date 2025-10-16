@@ -1,7 +1,7 @@
 
 # Part III Systems Biology Machine Learning Practical
 
-As hardware and deep learning methods continue to improve, neural networks are now all around us. They impact our day-to-day lives in more ways than most people realise: As you read this sentence, there is a very good chance that a neural network is running on your wrist or in your pocket in order to make real-time predictions from data. In this practical, we will explore the the application of neural networks to wearable technology and healthcare by predicting abnormal heartbeats from electrocardogram (ECG) data. ECGs are available on devices such as the Apple Watch (https://support.apple.com/en-us/HT208955) and can be used to identify irregular heart rhythms (such as atrial fibrillation) which are a major risk factor for stroke. As we work through the practical, we will give special consideration to the engineering constraints we might have to contend with in order to detect an irregular heartbeat on a wearable device.
+As hardware and deep learning methods continue to improve, neural networks are now all around us. They impact our day-to-day lives in more ways than most people realise: As you read this sentence, there is a very good chance that a neural network is running on your wrist or in your pocket in order to make real-time predictions from data. In this practical, we will explore the the application of neural networks to wearable technology and healthcare by predicting abnormal heartbeats from electrocardogram (ECG) data. ECGs are available on devices from manufacturers such as Apple and Garmin and can be used to identify irregular heart rhythms (such as atrial fibrillation) which are a major risk factor for stroke. As we work through the practical, we will give special consideration to the engineering constraints we might have to contend with in order to detect an irregular heartbeat on a wearable device.
 
 # Outline and Outcomes
 
@@ -21,8 +21,7 @@ By the end of this practical, you should feel confident in:
 ### Software
 The software for this practical will be:
 
-- Python 3.8,
-- Tensorflow 2.12.0,
+- Tensorflow,
 - Pandas,
 - scikit-learn,
 - matplotlib.
@@ -31,21 +30,6 @@ Neural network training will be done in Tensorflow. Pandas, scikit-learn, and ma
 
 ### Data Set and Format
 The data set is the PTB Diagnostic ECG Database. This consists of 14552 ECGs divided into two classes: normal and abnormal. The data is organised into two spreadsheets in comma-separated value format (ptbdb_normal.csv and pdbdb_abnormal.csv) such that each row is a different ECG signal. The signals are sampled at 125 Hz with samples along the columns. Each signal has a maximum of 187 samples (i.e., columns). If the signal was longer this, it was truncated; if the signal was shorter than this, it is padded with zeros. Each signal is given a binary label in the rightmost column (1 for abnormal, 0 for normal).
-
-### Using Docker
-A Docker image is available that is pre-loaded with the above software and datasets. You can pull it by doing:
-```shell
-docker pull mboemo458/partiii_ml:latest
-```
-Suppose you've written a Python script called `my_script.py`, the script is in your current directory, and you want to run it. You can do this with:
-```shell
-docker run -v $(pwd):/scripts mboemo458/partiii_ml my_script.py
-```
-This will mount your current directory (where your`my_script.py` file is located) to the /scripts directory in the container and run it. The above datasets were also loaded into a directory in the image called /data so you can access them from `my_script.py` by doing:
-```python
-f = open('/data/pdbdb_abnormal.csv','r')
-```
-
 
 # Part I: Building and Training a First Neural Network
 
@@ -122,7 +106,7 @@ Our data is ready to go, but we still need to make our neural network. To do thi
 
 Every neural network needs at least one input layer and these input layers need to know the shape of the input they'll be passed. Recall from above that each ECG signal has a length of 187 columns. For each of these columns, we only have one real number (the magnitude of the signal) and so our input shape is: 
 ```python
-input_layer= Input(shape=(187))
+input_layer= Input(shape=[187])
 ```
 For the sake of the argument, suppose that we actually had measurements of two different features at each time step. In that case, we would have:
 ```python
@@ -169,7 +153,7 @@ print(model.summary())
 Putting it all together, our model looks as follows:
 
 ```python
-input_layer= Input(shape=(187))
+input_layer= Input(shape=[187])
 X_layer = Dense(100, activation='relu')(input_layer)
 X_layer  = Dropout(0.5)(X_layer)
 X_layer  = Dense(50, activation='relu')(X_layer)
@@ -201,7 +185,7 @@ Finally, we'll save our trained model in a directory called `model_trained`. We 
 
 ```
 history = model.fit(x=dat_train, y=lab_train, batch_size=32, epochs=100, validation_split=0.2, verbose=1, callbacks=[es,csv])
-model.save('model_trained')
+model.save('model_trained.keras')
 ```
 
 ## Evaluating the Model
@@ -273,7 +257,7 @@ ECGs are time series, hence it's very tempting to try to use a recurrent neural 
 
 You may find it useful to think about the following design considerations:
 
-- Previously, we used `input_layer= Input(shape=(187))` to define the shape of the input. For an recurrent neural network, we must make it explicit that we only have one feature per timestep by doing `input_layer= Input(shape=(187,1))`.
+- Previously, we used `input_layer= Input(shape=[187])` to define the shape of the input. For an recurrent neural network, we must make it explicit that we only have one feature per timestep by doing `input_layer= Input(shape=(187,1))`.
 - LSTMs permit the masking of zeros via a masking layer (https://www.tensorflow.org/api_docs/python/tf/keras/layers/Masking). You may wish to use this layer after your input layer to tell your LSTM layers to ignore zero-padded positions.
 - If we have a layer would output a matrix of shape (M, N), then a Flatten layer (https://www.tensorflow.org/api_docs/python/tf/keras/layers/Flatten) will turn it into a one-dimensional vector of length M*N. Depending on the architecture you design, you may find it useful to use a Flatten layer before your final Dense layer.
 - Think carefully about when and where you want `return_sequences = True` and `return_sequences=False` in your LSTM layers. 
